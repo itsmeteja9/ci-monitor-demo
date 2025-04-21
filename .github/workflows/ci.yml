@@ -1,0 +1,28 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run dummy tests
+        run: |
+          echo "Running tests"
+          exit 0  # Change to 1 to simulate a failure
+
+      - name: Send Metrics to Datadog
+        if: always()
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          pip install requests
+          python scripts/report_ci_metrics.py ${{ job.status }}
